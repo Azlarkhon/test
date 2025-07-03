@@ -15,14 +15,35 @@ type Coord struct {
 }
 
 type Ship struct {
-	ID     string
-	Coords []Coord
+	ID     string   `json:"id"`
+	Type   ShipType `json:"type"` // New!
+	Coords []Coord  `json:"coords"`
+}
+
+type ShipType string
+
+const (
+	Battleship ShipType = "battleship" // size 4
+	Cruiser    ShipType = "cruiser"    // size 3
+	Destroyer  ShipType = "destroyer"  // size 2
+	Submarine  ShipType = "submarine"  // size 1
+)
+
+var AllowedShips = map[ShipType]struct {
+	Size  int
+	Count int
+}{
+	Battleship: {Size: 4, Count: 1},
+	Cruiser:    {Size: 3, Count: 2},
+	Destroyer:  {Size: 2, Count: 3},
+	Submarine:  {Size: 1, Count: 4},
 }
 
 type GameState struct {
 	Field     [10][10]CellState
 	Ships     map[string]Ship
 	ShotsMade []Coord
+	shipIDSeq int // <-- Add this line
 }
 
 func NewGameState() *GameState {
@@ -64,6 +85,9 @@ func (gs *GameState) isValidShip(ship Ship) bool {
 func (gs *GameState) hasNearShips(coords []Coord) bool {
 	nearCoords := getNearCoords(coords)
 	for _, coord := range nearCoords {
+		if !gs.isInside(coord) {
+			continue
+		}
 		if gs.Field[coord.X][coord.Y] == ShipCell {
 			return true
 		}
