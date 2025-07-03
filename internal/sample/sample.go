@@ -5,7 +5,7 @@ import (
 	"log"
 
 	"lesta-battleship/server-core/internal/game"
-	"lesta-battleship/server-core/internal/game/transaction"
+	"lesta-battleship/server-core/internal/transaction"
 )
 
 func RunSample() {
