@@ -1,0 +1,106 @@
+{
+  "functions": {
+    "OPEN_CELL": {"input": ["x", "y"], "description": "Открыть для игрока клетку с координатами x, y"},
+    "MAKE_SHOT": {"input": ["x", "y"], "description": "Выстрелить в клетку с координатами x, y"},
+    "SET_CELL_STATUS": {"input": ["x", "y", "status"], "description": "Задать статус клетки с координатами x, y. Статусы: 'вода: water', 'корабль: ship', 'подбитый корабль: shipwreck'"},
+    "SET_SHIP_COORDINATES": {"input": ["x", "y", "x2", "y2"], "description": "Задать новые координаты корабля с координатами x, y"},
+    "END_PLAYER_ACTION": {"input": "None", "description": "Завершает ход игрока"},
+    "RAND": {"input": "None", "description": "Возвращает случайное число в рамках размера поля"},
+    "PREV_RAND": { "input": "None", "description": "Возвращает последнее случайное число, которое вернула функция RAND" }
+  },
+
+  "variables": {
+    "FIELD_SIZE": {"type": "int", "description": "размер поля"}
+  },
+
+  "items": {
+
+    "Крест Нахимова": {
+      "description": "Открывает клетку и клетку сверху, снизу, справа и слева от неё",
+      "input": "Координаты выбранной клетки (x, y)",
+      "actions": [
+        { "OPEN_CELL": {"x": "x", "y": "y"} },
+        { "OPEN_CELL": {"x": "x", "y": "y+1"} },
+        { "OPEN_CELL": {"x": "x+1", "y": "y"} },
+        { "OPEN_CELL": {"x": "x", "y": "y-1"} },
+        { "OPEN_CELL": {"x": "x-1", "y": "y"} },
+        { "END_PLAYER_ACTION": "None" }
+      ]
+    },
+
+    "Ремонтный набор": {
+      "description": "переносит корабль на новое место",
+      "input": "Координаты выбранной клетки (x, y)",
+      "actions": [
+        { "SET_CELL_STATUS": {"status": "ship"} },
+        { "END_PLAYER_ACTION": "None" }
+      ]
+    },
+
+    "Боевой приказ": {
+      "description": "восстанавливает клетку корабля, если весь корабль жив",
+      "input": "Координаты выбранной клетки (x, y), координаты новой клетки (x2, y2), наличие разведки противника на (x2, y2)",
+      "actions": [
+        { "SET_SHIP_COORDINATES": { "x": "x", "y": "y", "x2": "x2", "y2": "y2" } },
+        { "END_PLAYER_ACTION": "None" },
+        { "MAKE_SHOT": { "x": "x", "y": "y"} },
+        { "SWICH_CASE": {
+          "1": { "END_PLAYER_ACTION": "None" },
+          "2": [ { "END_PLAYER_ACTION": "None" }, { "END_PLAYER_ACTION": "None" } ]
+        } }
+      ]
+    },
+
+    "Конь": {
+      "description": "Открывает клетки по форме 'Г', положение 'Г' можно выбрать",
+      "input": "Координаты выбранной клетки (x, y) и направление 'direction'",
+      "actions": [
+        { "SWICH_CASE": {
+          "1": [ {"OPEN_CELL": {"x": "x", "y": "y"}}, {"OPEN_CELL": {"x": "x", "y": "y+1"}}, {"OPEN_CELL": {"x": "x", "y": "y+2"}}, {"OPEN_CELL": {"x": "x-1", "y": "y+2"}} ],
+          "2": [ {"OPEN_CELL": {"x": "x", "y": "y"}}, {"OPEN_CELL": {"x": "x", "y": "y+1"}}, {"OPEN_CELL": {"x": "x", "y": "y+2"}}, {"OPEN_CELL": {"x": "x+1", "y": "y+2"}} ],
+          "3": [ {"OPEN_CELL": {"x": "x", "y": "y"}}, {"OPEN_CELL": {"x": "x+1", "y": "y"}}, {"OPEN_CELL": {"x": "x+2", "y": "y"}}, {"OPEN_CELL": {"x": "x+2", "y": "y+1"}} ],
+          "4": [ {"OPEN_CELL": {"x": "x", "y": "y"}}, {"OPEN_CELL": {"x": "x+1", "y": "y"}}, {"OPEN_CELL": {"x": "x+2", "y": "y"}}, {"OPEN_CELL": {"x": "x+2", "y": "y-1"}} ],
+          "5": [ {"OPEN_CELL": {"x": "x", "y": "y"}}, {"OPEN_CELL": {"x": "x", "y": "y-1"}}, {"OPEN_CELL": {"x": "x", "y": "y-2"}}, {"OPEN_CELL": {"x": "x+1", "y": "y-2"}} ],
+          "6": [ {"OPEN_CELL": {"x": "x", "y": "y"}}, {"OPEN_CELL": {"x": "x", "y": "y-1"}}, {"OPEN_CELL": {"x": "x", "y": "y-2"}}, {"OPEN_CELL": {"x": "x-1", "y": "y-2"}} ],
+          "7": [ {"OPEN_CELL": {"x": "x", "y": "y"}}, {"OPEN_CELL": {"x": "x-1", "y": "y"}}, {"OPEN_CELL": {"x": "x-2", "y": "y"}}, {"OPEN_CELL": {"x": "x-2", "y": "y-1"}} ],
+          "8": [ {"OPEN_CELL": {"x": "x", "y": "y"}}, {"OPEN_CELL": {"x": "x-1", "y": "y"}}, {"OPEN_CELL": {"x": "x-2", "y": "y"}}, {"OPEN_CELL": {"x": "x-2", "y": "y+1"}} ]
+        } },
+        { "END_PLAYER_ACTION": "None" }
+      ]
+    },
+
+    "Ладья": {
+      "description": "Открывает 5 рандомных клеток на выбранной прямой, направления прямой можно выбрать",
+      "input": "Координаты выбранной клетки (x, y) и направление 'direction'",
+      "actions": [
+        { "SWICH_CASE": {
+          "1": [ {"OPEN_CELL": {"x": { "RAND": "None" }, "y": "y"}}, {"OPEN_CELL": {"x": { "RAND": "None" }, "y": "y"}}, {"OPEN_CELL": {"x": { "RAND": "None" }, "y": "y"}}, {"OPEN_CELL": {"x": { "RAND": "None" }, "y": "y"}}, {"OPEN_CELL": {"x": { "RAND": "None" }, "y": "y"}} ],
+          "2": [ {"OPEN_CELL": {"x": "x", "y": { "RAND": "None" }}}, {"OPEN_CELL": {"x": "x", "y": { "RAND": "None" }}}, {"OPEN_CELL": {"x": "x", "y": { "RAND": "None" }}}, {"OPEN_CELL": {"x": "x", "y": { "RAND": "None" }}}, {"OPEN_CELL": {"x": "x", "y": { "RAND": "None" }}} ]
+        } }
+      ]
+    },
+
+    "Слон": {
+      "description": "Открывает 5 рандомных клеток на выбранной диагонали, направление диагонали можно выбрать",
+      "input": "Координаты выбранной клетки (x, y) и направление 'direction'",
+      "actions": [
+        { "SWICH_CASE": {
+          "1": [ {"OPEN_CELL": {"x": "{'RAND':'None'} - FIELD_SIZE + x", "y": "{'PREV_RAND':'None'} - FIELD_SIZE + y"}}, {"OPEN_CELL": {"x": "{'RAND':'None'} - FIELD_SIZE + x", "y": "{'PREV_RAND':'None'} - FIELD_SIZE + y"}}, {"OPEN_CELL": {"x": "{'RAND':'None'} - FIELD_SIZE + x", "y": "{'PREV_RAND':'None'} - FIELD_SIZE + y"}}, {"OPEN_CELL": {"x": "{'RAND':'None'} - FIELD_SIZE + x", "y": "{'PREV_RAND':'None'} - FIELD_SIZE + y"}}, {"OPEN_CELL": {"x": "{'RAND':'None'} - FIELD_SIZE + x", "y": "{'PREV_RAND':'None'} - FIELD_SIZE + y"}} ],
+          "2": [ {"OPEN_CELL": {"x": "{'RAND':'None'} - FIELD_SIZE + x", "y": "y - {'PREV_RAND':'None'} + FIELD_SIZE"}}, {"OPEN_CELL": {"x": "{'RAND':'None'} - FIELD_SIZE + x", "y": "y - {'PREV_RAND':'None'} + FIELD_SIZE"}}, {"OPEN_CELL": {"x": "{'RAND':'None'} - FIELD_SIZE + x", "y": "y - {'PREV_RAND':'None'} + FIELD_SIZE"}}, {"OPEN_CELL": {"x": "{'RAND':'None'} - FIELD_SIZE + x", "y": "y - {'PREV_RAND':'None'} + FIELD_SIZE"}}, {"OPEN_CELL": {"x": "{'RAND':'None'} - FIELD_SIZE + x", "y": "y - {'PREV_RAND':'None'} + FIELD_SIZE"}} ]
+        } }
+      ]
+    },
+
+    "Ферзь": {
+      "description": "открывает выбранную клетку, по рандомной клетке на каждой диагонали и по клетке на вертикали и горизонтали",
+      "input": "Координаты выбранной клетки (x, y)",
+      "actions": [
+        {"OPEN_CELL": {"x": "x", "y": "y"}},
+        {"OPEN_CELL": {"x": "{'RAND':'None'} - FIELD_SIZE + x", "y": "{'PREV_RAND':'None'} - FIELD_SIZE + y"}},
+        {"OPEN_CELL": {"x": "{'RAND':'None'} - FIELD_SIZE + x", "y": "y - {'PREV_RAND':'None'} + FIELD_SIZE"}},
+        {"OPEN_CELL": {"x": { "RAND": "None" }, "y": "y"}},
+        {"OPEN_CELL": {"x": "x", "y": { "RAND": "None" }}}
+      ]
+    }
+  }
+}

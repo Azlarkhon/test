@@ -7,6 +7,7 @@ const (
 	ShipCell
 	Miss
 	Hit
+	Revealed
 )
 
 type Coord struct {
@@ -104,4 +105,25 @@ func getNearCoords(coords []Coord) []Coord {
 		nearCoords = append(nearCoords, Coord{X: coord.X, Y: coord.Y + 1})
 	}
 	return nearCoords
+}
+
+func OpenCell(x, y int, gs *GameState) string {
+	if x < 0 || y < 0 || x >= len(gs.Field) || y >= len(gs.Field[0]) {
+		return "invalid"
+	}
+	switch gs.Field[x][y] {
+	case Empty:
+		gs.Field[x][y] = Revealed
+		return "empty"
+	case ShipCell:
+		return "ship"
+	case Miss:
+		return "miss"
+	case Hit:
+		return "hit"
+	case Revealed:
+		return "revealed"
+	default:
+		return "unknown"
+	}
 }
