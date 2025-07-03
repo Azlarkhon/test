@@ -56,6 +56,21 @@ func RunSample() {
 		fmt.Println("Корабль перемещен и произведен выстрел")
 	}
 
+	// Транзакция 3: попытка разместить корабль рядом
+	tx3 := transaction.NewTransaction()
+	tx3.Add(&game.PlaceShipCommand{Ship: game.Ship{
+		ID: "ship-2",
+		Coords: []game.Coord{
+			{X: 2, Y: 2},
+		},
+	}})
+
+	if err := tx3.Execute(gs); err != nil {
+		fmt.Println("Ошибка, все откатилось", err)
+	} else {
+		fmt.Println("Корабль размещен")
+	}
+
 	printBoard(gs)
 }
 

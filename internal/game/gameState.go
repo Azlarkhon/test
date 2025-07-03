@@ -38,3 +38,46 @@ func (gs *GameState) isInside(c Coord) bool {
 func (gs *GameState) isCellEmpty(c Coord) bool {
 	return gs.Field[c.X][c.Y] == Empty
 }
+
+func (gs *GameState) isValidShip(ship Ship) bool {
+	firstX := ship.Coords[0].X
+	firstY := ship.Coords[0].Y
+
+	isHorizontal := true
+	isVertical := true
+
+	for _, coord := range ship.Coords {
+		if coord.X != firstX {
+			isVertical = false
+		}
+	}
+
+	for _, coord := range ship.Coords {
+		if coord.Y != firstY {
+			isHorizontal = false
+		}
+	}
+
+	return isHorizontal || isVertical
+}
+
+func (gs *GameState) hasNearShips(coords []Coord) bool {
+	nearCoords := getNearCoords(coords)
+	for _, coord := range nearCoords {
+		if gs.Field[coord.X][coord.Y] == ShipCell {
+			return true
+		}
+	}
+	return false
+}
+
+func getNearCoords(coords []Coord) []Coord {
+	nearCoords := []Coord{}
+	for _, coord := range coords {
+		nearCoords = append(nearCoords, Coord{X: coord.X - 1, Y: coord.Y})
+		nearCoords = append(nearCoords, Coord{X: coord.X + 1, Y: coord.Y})
+		nearCoords = append(nearCoords, Coord{X: coord.X, Y: coord.Y - 1})
+		nearCoords = append(nearCoords, Coord{X: coord.X, Y: coord.Y + 1})
+	}
+	return nearCoords
+}
