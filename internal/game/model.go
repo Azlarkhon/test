@@ -16,7 +16,7 @@ type Coord struct {
 
 type Ship struct {
 	ID     string   `json:"id"`
-	Type   ShipType `json:"type"` // New!
+	Type   ShipType `json:"type"`
 	Coords []Coord  `json:"coords"`
 }
 
