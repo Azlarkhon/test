@@ -3,10 +3,8 @@ package items
 import (
 	"fmt"
 	"lesta-battleship/server-core/internal/game"
-	"math/rand"
 	"strings"
 	"testing"
-	"time"
 )
 
 func printField(field [10][10]game.CellState) {
@@ -46,7 +44,8 @@ func TestUseItem_FromSpec(t *testing.T) {
 			]`,
 		}
 		params := map[string]interface{}{"x": 5, "y": 5}
-		_, err := UseItem(1, state, []Item{item}, params)
+		itemsMap := map[int]*Item{1: &item}
+		_, err := UseItem(1, state, itemsMap, params)
 		if err != nil {
 			t.Errorf("Крест Нахимова: %v", err)
 		}
@@ -65,7 +64,8 @@ func TestUseItem_FromSpec(t *testing.T) {
 			]`,
 		}
 		params := map[string]interface{}{"x": 2, "y": 3, "status": "ship"}
-		_, err := UseItem(2, state, []Item{item}, params)
+		itemsMap := map[int]*Item{2: &item}
+		_, err := UseItem(2, state, itemsMap, params)
 		if err != nil {
 			t.Errorf("Ремонтный набор: %v", err)
 		}
@@ -90,7 +90,8 @@ func TestUseItem_FromSpec(t *testing.T) {
 			]`,
 		}
 		params := map[string]interface{}{"x": 1, "y": 1, "x2": 3, "y2": 1}
-		_, err := UseItem(3, state, []Item{item}, params)
+		itemsMap := map[int]*Item{3: &item}
+		_, err := UseItem(3, state, itemsMap, params)
 		if err != nil {
 			t.Errorf("Боевой приказ: %v", err)
 		}
@@ -112,7 +113,8 @@ func TestUseItem_FromSpec(t *testing.T) {
 			]`,
 		}
 		params := map[string]interface{}{"x": 4, "y": 4}
-		_, err := UseItem(4, state, []Item{item}, params)
+		itemsMap := map[int]*Item{4: &item}
+		_, err := UseItem(4, state, itemsMap, params)
 		if err != nil {
 			t.Errorf("Конь: %v", err)
 		}
@@ -134,7 +136,8 @@ func TestUseItem_FromSpec(t *testing.T) {
 			]`,
 		}
 		params := map[string]interface{}{"y": 7}
-		_, err := UseItem(5, state, []Item{item}, params)
+		itemsMap := map[int]*Item{5: &item}
+		_, err := UseItem(5, state, itemsMap, params)
 		if err != nil {
 			t.Errorf("Ладья: %v", err)
 		}
@@ -167,7 +170,6 @@ func TestUseItem_FromSpec(t *testing.T) {
 			t.Fatalf("parse error: %v", err)
 		}
 		var prevRand float64
-		rand.Seed(time.Now().UnixNano())
 		for _, action := range actions {
 			for k, v := range action.Args {
 				if s, ok := v.(string); ok {
@@ -212,7 +214,8 @@ func TestUseItem_FromSpec(t *testing.T) {
 			]`,
 		}
 		params := map[string]interface{}{"x": 3, "y": 3, "FIELD_SIZE": 10}
-		_, err := UseItem(7, state, []Item{item}, params)
+		itemsMap := map[int]*Item{7: &item}
+		_, err := UseItem(7, state, itemsMap, params)
 		if err != nil {
 			t.Errorf("Ферзь: %v", err)
 		}

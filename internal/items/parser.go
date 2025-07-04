@@ -8,7 +8,6 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-	"time"
 )
 
 type Action struct {
@@ -51,9 +50,7 @@ func evalExpr(expr string, params map[string]interface{}, prevRand float64) (int
 	if expr == "" {
 		return 0, nil
 	}
-	if strings.HasPrefix(expr, "$") {
-		expr = expr[1:]
-	}
+	expr = strings.TrimPrefix(expr, "$")
 	if n, err := strconv.ParseFloat(expr, 64); err == nil {
 		return n, nil
 	}
@@ -82,9 +79,7 @@ func evalExpr(expr string, params map[string]interface{}, prevRand float64) (int
 	if strings.Contains(expr, "+") || strings.Contains(expr, "-") {
 		repl := func(s string) string {
 			s = strings.TrimSpace(s)
-			if strings.HasPrefix(s, "$") {
-				s = s[1:]
-			}
+			s = strings.TrimPrefix(s, "$")
 			if n, err := strconv.ParseFloat(s, 64); err == nil {
 				return fmt.Sprintf("%f", n)
 			}
@@ -105,9 +100,7 @@ func evalExpr(expr string, params map[string]interface{}, prevRand float64) (int
 		var nums []float64
 		for _, p := range parts {
 			p = strings.TrimSpace(p)
-			if strings.HasPrefix(p, "$") {
-				p = p[1:]
-			}
+			p = strings.TrimPrefix(p, "$")
 			if strings.HasPrefix(p, "{") && strings.HasSuffix(p, "}") {
 				v, _ := evalExpr(p, params, prevRand)
 				if f, ok := toFloat(v); ok {
@@ -153,7 +146,6 @@ func RunScript(script string, state *game.GameState, params map[string]interface
 	}
 	var lastResult string
 	var prevRand float64
-	rand.Seed(time.Now().UnixNano())
 
 	for _, action := range actions {
 		for k, v := range action.Args {
