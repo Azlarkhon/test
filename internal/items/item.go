@@ -75,7 +75,7 @@ func UseItem(id int, state *game.GameState, itemsMap map[int]*Item, params map[s
 			if !okX || !okY {
 				return "", fmt.Errorf("invalid args for open_cell")
 			}
-			cmd := NewOpenCellCommand(int(x), int(y))
+			cmd := game.NewOpenCellCommand(int(x), int(y))
 			tx.Add(cmd)
 
 		case "MAKE_SHOT":
@@ -84,7 +84,7 @@ func UseItem(id int, state *game.GameState, itemsMap map[int]*Item, params map[s
 			if !okX || !okY {
 				return "", fmt.Errorf("invalid args for MAKE_SHOT")
 			}
-			cmd := NewShootCommand(int(x), int(y))
+			cmd := &game.ShootCommand{Target: game.Coord{X: int(x), Y: int(y)}}
 			tx.Add(cmd)
 
 		case "SET_CELL_STATUS":
@@ -105,7 +105,7 @@ func UseItem(id int, state *game.GameState, itemsMap map[int]*Item, params map[s
 			default:
 				return "", fmt.Errorf("unknown cell status: %s", status)
 			}
-			cmd := NewSetCellStatusCommand(int(x), int(y), cellStatus)
+			cmd := game.NewSetCellStatusCommand(int(x), int(y), cellStatus)
 			tx.Add(cmd)
 
 		case "SET_SHIP_COORDINATES":
@@ -147,7 +147,7 @@ func UseItem(id int, state *game.GameState, itemsMap map[int]*Item, params map[s
 				}
 			}
 
-			cmd := NewSetShipCoordinatesCommand(shipID, ship.Coords, newCoords)
+			cmd := game.NewSetShipCoordinatesCommand(shipID, ship.Coords, newCoords)
 			tx.Add(cmd)
 
 		case "END_PLAYER_ACTION":
